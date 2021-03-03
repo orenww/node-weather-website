@@ -9,11 +9,13 @@ const forcast = (lat, lot, callback) => {
         } else if (body.error) {
             callback('Unable to find the location')            
         } else {
-            callback(undefined,{                
-                desc: body.current.weather_descriptions[0],
-                temperature: body.current.temperature,
-                feelslike: body.current.feelslike
-            })            
+            callback(undefined,                
+                'descrption: ' +  body.current.weather_descriptions[0] + 
+                ' temperature: ' + body.current.temperature + 
+                ' feelslike: ' + body.current.feelslike + 
+                ' windSpeed: ' + body.current.wind_speed + 
+                ' humidity: ' + body.current.humidity
+            )            
         }
     })
 }
