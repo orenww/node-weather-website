@@ -3,9 +3,21 @@ const express = require('express')
 const path = require('path')
 const chokidar = require('chokidar');
 const hbs = require('hbs');
+const { Logger } = require('log4js');
+const socketio = require('socket.io')
+const { messageQueueConsumer, messageQueueProducer }  = require('@acs/msmq-messaging');
+
+
 const geocode = require('./utils/geocode')
 const forecast = require('./utils/forecast')
-const socketio = require('socket.io')
+const  log4js = require("./utils/log4js");
+const  moveFiles = require('./utils/move-files');
+
+let pathToMonitor = 'C:\\tmp\\aaaaaaaaaaa\\beforeLoad'
+
+const logger = log4js((logger) => {    
+    return logger;
+})
 
 const app = express()
 const server = http.createServer(app)
@@ -47,8 +59,6 @@ app.get('/help', (req, res) => {
     })
 })
 
-let pathToMonitor = 'C:\\tmp\\aaaaaaaaaaa'
-
 app.get('/weather', (req, res) => {
     if (!req.query.pathToMonitor) {
         return res.send({
@@ -57,6 +67,8 @@ app.get('/weather', (req, res) => {
     }
     
     pathToMonitor = req.query.pathToMonitor
+
+    logger.info(pathToMonitor)
 
     watcher.close().then(() => {
         watcher.add(pathToMonitor)
@@ -127,30 +139,53 @@ io.on('connection', (socket) => {
 })
 
 openWatcher = () => {
-    let watcher = chokidar.watch(pathToMonitor, { persistent: true });
+    let watcher = chokidar.watch(pathToMonitor, { persistent: true, ignoreInitial:true });
 
     // Add event listeners.
-    watcher
-    .on('add', (path) => {
-    console.log(`File ${path} has been added`)
-    io.emit('countUpdated', `File ${path} has been added`)
+    watcher.on('add', (path) => {
+        console.log(`File ${path} has been added`)
+        logger.info(`File ${path} has been added`)
+        io.emit('pathToMonitorUpdated', `File ${path} has been added`) 
+        
+        // setTimeout(() => {
+            moveFiles.move(path);
+        // },3000)
+        
     })
 
-    .on('change', path => console.log(`File ${path} has been changed`))
+    // .on('change', path => console.log(`File ${path} has been changed`))
     //   .on('unlink', path => console.log(`File ${path} has been removed`));
 
     // More possible events.
-    watcher
-    .on('addDir', path => console.log(`Directory ${path} has been added`))
+    watcher.on('addDir', (path) => {
+        console.log(`Directory ${path} has been added`)
+
+        logger.info(`File ${path} has been added`)
+        io.emit('pathToMonitorUpdated', `File ${path} has been added`) 
+        
+
+        // setTimeout(() => {
+            moveFiles.move(path);
+        // },6000)        
+    })
+    
     //   .on('unlinkDir', path => console.log(`Directory ${path} has been removed`))
-    .on('error', error => console.log(`Watcher error: ${error}`))
-    .on('ready', () => console.log('Initial scan complete. Ready for changes'))
+    // .on('error', error => console.log(`Watcher error: ${error}`))
+    // .on('ready', () => console.log('Initial scan complete. Ready for changes'))
 
     return watcher;
 }
 
 // Initialize watcher.
 const watcher = openWatcher()
+
+// messageQueueConsumer = new MessageQueueConsumer(".\\private$\\infield.messagequeue.requests-tx", new events.EventEmitter(), this.logger);
+//messageQueueProducer = this.configMessageQueueProducer();
+
+
+// private configMessageQueueProducer(): MessageQueueProducer {
+//     return new MessageQueueProducer(this.globals.producerMessageQueuePath, this.outgoingResponseQ, logger);
+// }
 
  
  
