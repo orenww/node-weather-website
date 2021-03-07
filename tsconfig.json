@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "es2017",
+        "moduleResolution": "node",
+        "module": "commonjs",
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "noImplicitAny": true,
+        "declaration": true,
+        "strictPropertyInitialization": false,
+        "skipLibCheck": true,
+        "emitDecoratorMetadata": true
+        //"outDir": "./lib"
+    },
+    "include": ["*", "src/**/*", "test/**/*"],
+    "exclude": ["node_modules", "**/*-spec.ts"]
+}

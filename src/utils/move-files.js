@@ -1,35 +1,31 @@
-const fse = require('fs-extra')
-const  log4js = require("./log4js");
-const path = require('path');
-const { log } = require('console');
-const { addSlashes, stripSlashes } = require('slashes');
-
-const rootPathLoaded = 'C:\\tmp\\aaaaaaaaaaa\\afterLoad\\'
-
-const logger = log4js((logger) => {    
-    return logger;
-})
-
-const move = (pathToRemove) => { 
-
-    console.log('path - ',pathToRemove);
-    const fileName = path.basename(pathToRemove)
-    console.log(fileName);    
-    let pathLoaded = path.join(rootPathLoaded, fileName) 
-    pathLoaded = addSlashes(pathLoaded); 
-    console.log('pathLoaded - ',pathLoaded);
-    
-
-    // Async with callbacks:
-    fse.move(pathToRemove, pathLoaded, err => {
-        if (err) {
-            console.log('fse.move - ', err);
-            return console.error(err)
-        }
-        console.log('success!')
-    })
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// import log4js from "log4js";
+const path = require("path");
+const slashes_1 = require("slashes");
+class Watcer {
+    constructor() {
+        this.rootPathLoaded = 'C:\\tmp\\aaaaaaaaaaa\\afterLoad\\';
+    }
+    // const logger = log4js((logger) => {    
+    //     return logger;
+    // })
+    move(pathToRemove) {
+        console.log('path - ', pathToRemove);
+        const fileName = path.basename(pathToRemove);
+        console.log(fileName);
+        let pathLoaded = path.join(this.rootPathLoaded, fileName);
+        pathLoaded = slashes_1.addSlashes(pathLoaded);
+        console.log('pathLoaded - ', pathLoaded);
+        // Async with callbacks:
+        // this.fse.move(pathToRemove, pathLoaded, err => {
+        //     if (err) {
+        //         console.log('fse.move - ', err);
+        //         return console.error(err)
+        //     }
+        //     console.log('success!')
+        // })
+    }
 }
-
-module.exports = {
-    move: move    
-}
+exports.default = Watcer;
+//# sourceMappingURL=move-files.js.map
